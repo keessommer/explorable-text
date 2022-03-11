@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <Style>
+        body{
+            color: white;
+            background-color : black;
+            overflow-y: hidden; 
+            overflow-x: hidden; 
+        }
+        .description{
+            display: none;
+            font-size: 30pt;
+        }
+        .visible{
+            display: block;
+        }
+        .visibleChair{
+            top: 1000px;
+            background-color: green;
+            transform: translate(100px, 100px);
+        }
+        #container {
+            cursor: grab;
+            overflow: auto;
+            height: 100vh; 
+            overflow: auto; 
+            padding: 0 2rem
+        }
+
+        .item {
+            /* Center the content */
+            align-items: center;
+            display: flex;
+            justify-content: center;
+
+            /* Misc */
+            border: 1px solid #cbd5e0;
+            font-size: 2.25rem;
+            height: 12rem;
+            margin: 2rem 0;
+            width: 200rem;
+        }
+    </Style>
+</head>
+<body>
+
+    <div id="container">
+        <div class="item">1</div>
+        <div class="item">2</div>
+        <div class="item">3</div>
+        <div class="item">4</div>
+        <div class="item">5</div>
+        <div class="item">6</div>
+        <div class="item">7</div>
+        <div class="item">8</div>
+        <div class="item">9</div>
+        <div class="item">10</div>
+        <div class="main"></div>
+    </div>
+    <script>
+        const nodes = {
+            rooms: {
+                room1 : {
+                    name: 'room1',
+                    description: 'In the room is a table and a <a onClick="clickChair()">chair</a>.',
+                    x: '0',
+                    y: '0',
+                    objects: [
+                        {name: 'chair', x : '100px', y : '100px'},
+                    ]
+                },
+            },
+            objects: {
+                chair : {
+                    name: 'chair',
+                    description: 'The chair is nice and soft.',
+                },
+            }
+        }
+
+        const mainHtml = document.querySelector('.main');
+        mainHtml.innerHTML += addNodeAsP(nodes.rooms.room1, nodes.rooms.room1.x, nodes.rooms.room1.y);
+        let room = document.querySelector('#room1');
+        room.classList.add('visible');
+        nodes['rooms']['room1']['objects'].forEach(
+            object => {
+                room.innerHTML += addNodeAsP(nodes['objects'][object['name']], object.x, object.y)
+            }
+        );
+        
+        function addNodeAsP(node, x, y){
+            return `<div class="description" id="${node.name}">${node['description']}</div>`;
+        }
+
+        function clickChair(){
+            let node = document.querySelector('#chair');
+            node.classList.toggle('visible');
+            node.classList.toggle('visibleChair');
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const ele = document.getElementById('container');
+            ele.style.cursor = 'grab';
+
+            let pos = { top: 0, left: 0, x: 0, y: 0 };
+
+            const mouseDownHandler = function (e) {
+                ele.style.cursor = 'grabbing';
+                ele.style.userSelect = 'none';
+
+                pos = {
+                    left: ele.scrollLeft,
+                    top: ele.scrollTop,
+                    // Get the current mouse position
+                    x: e.clientX,
+                    y: e.clientY,
+                };
+
+                document.addEventListener('mousemove', mouseMoveHandler);
+                document.addEventListener('mouseup', mouseUpHandler);
+            };
+
+            const mouseMoveHandler = function (e) {
+                const dx = e.clientX - pos.x;
+                const dy = e.clientY - pos.y;
+                ele.scrollTop = pos.top - dy;
+                ele.scrollLeft = pos.left - dx;
+            };
+
+            const mouseUpHandler = function () {
+                ele.style.cursor = 'grab';
+                ele.style.removeProperty('user-select');
+                document.removeEventListener('mousemove', mouseMoveHandler);
+                document.removeEventListener('mouseup', mouseUpHandler);
+            };
+
+            ele.addEventListener('mousedown', mouseDownHandler);
+        });
+        
+    </script>
+</body>
+
+</html>
