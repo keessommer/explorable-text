@@ -13,16 +13,11 @@
             overflow-x: hidden; 
         }
         .description{
-            display: none;
-            font-size: 30pt;
-        }
-        .visible{
             display: block;
-        }
-        .visibleChair{
-            top: 1000px;
-            background-color: green;
-            transform: translate(100px, 100px);
+            font-size: 16pt;
+            transition: 1s;
+            color: black;
+            max-width: 300px;
         }
         #container {
             cursor: grab;
@@ -32,75 +27,85 @@
             padding: 0 2rem
         }
 
-        .item {
-            /* Center the content */
+        /* .item {
+
             align-items: center;
             display: flex;
             justify-content: center;
 
-            /* Misc */
+
             border: 1px solid #cbd5e0;
             font-size: 2.25rem;
             height: 12rem;
             margin: 2rem 0;
             width: 200rem;
-        }
+        } */
     </Style>
 </head>
 <body>
-
     <div id="container">
-        <div class="item">1</div>
-        <div class="item">2</div>
-        <div class="item">3</div>
-        <div class="item">4</div>
-        <div class="item">5</div>
-        <div class="item">6</div>
-        <div class="item">7</div>
-        <div class="item">8</div>
-        <div class="item">9</div>
-        <div class="item">10</div>
         <div class="main"></div>
     </div>
     <script>
         const nodes = {
             rooms: {
-                room1 : {
-                    name: 'room1',
-                    description: 'In the room is a table and a <a onClick="clickChair()">chair</a>.',
-                    x: '0',
-                    y: '0',
+                square : {
+                    name: 'square',
+                    description: 'Evening twilight turns the town square golden. In the center stands an old tree, while buildings encircle its periphery.',
+                    x: '50vw',
+                    y: '50vh',
                     objects: [
-                        {name: 'chair', x : '100px', y : '100px'},
+                        {name: 'tree', x : '0px', y : '-300px'},
+                        {name: 'buildings', x : '0px', y : '10px'},
                     ]
                 },
             },
             objects: {
-                chair : {
-                    name: 'chair',
-                    description: 'The chair is nice and soft.',
+                tree : {
+                    name: 'tree',
+                    description: 'The old tree stands tall. Its roots break through the cobblestone. Pigeons flock around the base.',
+                },
+                buildings : {
+                    name: 'buildings',
+                    description: 'Houses and apartments stand abandoned. On the ground floor storefronts lie emptied.',
                 },
             }
         }
-// comment to push again
+
         const mainHtml = document.querySelector('.main');
-        mainHtml.innerHTML += addNodeAsP(nodes.rooms.room1, nodes.rooms.room1.x, nodes.rooms.room1.y);
-        let room = document.querySelector('#room1');
-        room.classList.add('visible');
-        nodes['rooms']['room1']['objects'].forEach(
+        const initialRoom = nodes.rooms.square;
+        initialRoom.objects.forEach(
             object => {
-                room.innerHTML += addNodeAsP(nodes['objects'][object['name']], object.x, object.y)
+                const pos = initialRoom.description.indexOf(object.name);
+                const nameLength = object.name.length;
+                initialRoom.description = initialRoom.description.slice(0, pos) 
+                + '<a onClick = "clickWord(event)">'
+                + initialRoom.description.slice(pos, pos+nameLength)
+                + '</a>' + initialRoom.description.slice(pos+nameLength);
             }
         );
-        
-        function addNodeAsP(node, x, y){
-            return `<div class="description" id="${node.name}">${node['description']}</div>`;
+        mainHtml.innerHTML += addNodeAsP(initialRoom, initialRoom.x, initialRoom.y);
+        const initialRoomEl = document.querySelector(`#description${initialRoom.name}`);
+        initialRoom.objects.forEach(
+            object => {
+                initialRoomEl.innerHTML += addNodeAsP(nodes.objects[object.name], object.x, object.y);
+            }
+        );
+        makeVisible(initialRoomEl, initialRoom.x, initialRoom.y);
+        function addNodeAsP(node){
+            return `<div class="description" id="description${node.name}" 
+            >${node['description']}</div>`;
         }
 
-        function clickChair(){
-            let node = document.querySelector('#chair');
-            node.classList.toggle('visible');
-            node.classList.toggle('visibleChair');
+        function makeVisible(el, x, y){
+            console.log(x, y)
+            el.style = `color: white; transform: translate(${x}, ${y})`;
+        }
+
+        function clickWord(input){
+            const el = document.querySelector(`#description${input.target.text}`);
+            const node = initialRoom.objects.find( entry => entry.name == input.target.text);
+            makeVisible(el, node.x, node.y);
         }
 
         document.addEventListener('DOMContentLoaded', function () {
