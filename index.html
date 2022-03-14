@@ -42,29 +42,41 @@
                 x: '40vw',
                 y: '40vh',
                 objects: [
-                    {name: 'tree', x : '-30px', y : '-300px'},
-                    {name: 'buildings', x : '200px', y : '100px'},
-                ]
+                    {name: 'tree', x : '-50px', y : '-400px'},
+                    {name: 'buildings', x : '200px', y : '-150px'},
+                ],
             },
             tree : {
                 name: 'tree',
-                description: 'The old <u>tree</u> stands tall. Its roots break through the cobblestone. Pigeons flock around the base.',
+                description: 'The old <u>tree</u> stands tall.\
+                Its roots break through the cobblestone. Pigeons flock around the base.',
+                objects: [
+                    {name: 'Pigeons', x : '350px', y : '-50px'},
+                ],
+            },
+            Pigeons : {
+                name: 'Pigeons',
+                description: 'The <u>pigeons</u> travel back and forth to the rooftops.\
+                There must be a reason they built their nests up there.',
             },
             buildings : {
                 name: 'buildings',
-                description: 'The <u>buildings</u> are an abandoned circle of houses_and_apartments. On the ground floor storefronts lie emptied.',
+                description: 'The <u>buildings</u> are an abandoned circle of \
+                houses_and_apartments. On the ground floor storefronts stand empty.',
                 objects: [
                     {name: 'houses_and_apartments', x : '400px', y : '-50px'},
-                    {name: 'storefronts', x : '50px', y : '-300px'},
-                ]
+                    {name: 'storefronts', x : '300px', y : '-350px'},
+                ],
             },
             houses_and_apartments : {
                 name: 'houses_and_apartments',
-                description: '<u>Houses and apartments</u> stacked next to each other.',
+                description: '<u>Houses and apartments</u> stand like crooked teeth around the center.\
+                The sound of running water is coming from the gutters.',
             },
             storefronts : {
                 name: 'storefronts',
-                description: 'The <u>storefronts</u> are deserted reminders of brands long gone.',
+                description: '<u>Storefronts</u> are filled with ads of products that haven\'t existed in a long time.\
+                Stairs connect the shops to the buildings above them.',
             },
         }
 
@@ -92,7 +104,8 @@
                 const objectEl = initialRoomEl.lastChild;
                 nodes[object.name].objects?.forEach(nestedObject => {
                     console.log(nestedObject.name);
-                    objectEl.innerHTML += addNodeAsP(nodes[nestedObject.name], nestedObject.x, nestedObject.y)
+                    objectEl.innerHTML += addNodeAsP(nodes[nestedObject.name], 
+                    nestedObject.x, nestedObject.y);
                 });
             }
         );
