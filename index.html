@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Explorable text prototype</title>
     <Style>
         body{
             color: white;
@@ -13,11 +13,11 @@
             overflow-x: hidden; 
         }
         .description{
-            display: block;
             font-size: 16pt;
             transition: 1s;
             color: black;
             max-width: 300px;
+            position: relative;
         }
         #container {
             cursor: grab;
@@ -26,20 +26,6 @@
             overflow: auto; 
             padding: 0 2rem
         }
-
-        /* .item {
-
-            align-items: center;
-            display: flex;
-            justify-content: center;
-
-
-            border: 1px solid #cbd5e0;
-            font-size: 2.25rem;
-            height: 12rem;
-            margin: 2rem 0;
-            width: 200rem;
-        } */
     </Style>
 </head>
 <body>
@@ -48,63 +34,82 @@
     </div>
     <script>
         const nodes = {
-            rooms: {
-                square : {
-                    name: 'square',
-                    description: 'Evening twilight turns the town square golden. In the center stands an old tree, while buildings encircle its periphery.',
-                    x: '50vw',
-                    y: '50vh',
-                    objects: [
-                        {name: 'tree', x : '0px', y : '-300px'},
-                        {name: 'buildings', x : '0px', y : '10px'},
-                    ]
-                },
+            square : {
+                name: 'square',
+                description: 'Evening twilight turns the town square golden. In the center stands an old tree, while buildings encircle its periphery.',
+                x: '40vw',
+                y: '40vh',
+                objects: [
+                    {name: 'tree', x : '-30px', y : '-300px'},
+                    {name: 'buildings', x : '200px', y : '100px'},
+                ]
             },
-            objects: {
-                tree : {
-                    name: 'tree',
-                    description: 'The old tree stands tall. Its roots break through the cobblestone. Pigeons flock around the base.',
-                },
-                buildings : {
-                    name: 'buildings',
-                    description: 'Houses and apartments stand abandoned. On the ground floor storefronts lie emptied.',
-                },
-            }
+            tree : {
+                name: 'tree',
+                description: 'The old <u>tree</u> stands tall. Its roots break through the cobblestone. Pigeons flock around the base.',
+            },
+            buildings : {
+                name: 'buildings',
+                description: 'The <u>buildings</u> are an abandoned circle of houses_and_apartments. On the ground floor storefronts lie emptied.',
+                objects: [
+                    {name: 'houses_and_apartments', x : '400px', y : '-50px'},
+                    {name: 'storefronts', x : '50px', y : '-300px'},
+                ]
+            },
+            houses_and_apartments : {
+                name: 'houses_and_apartments',
+                description: '<u>Houses and apartments</u> stacked next to each other.',
+            },
+            storefronts : {
+                name: 'storefronts',
+                description: 'The <u>storefronts</u> are deserted reminders of brands long gone.',
+            },
         }
 
         const mainHtml = document.querySelector('.main');
-        const initialRoom = nodes.rooms.square;
-        initialRoom.objects.forEach(
-            object => {
-                const pos = initialRoom.description.indexOf(object.name);
-                const nameLength = object.name.length;
-                initialRoom.description = initialRoom.description.slice(0, pos) 
-                + '<a onClick = "clickWord(event)">'
-                + initialRoom.description.slice(pos, pos+nameLength)
-                + '</a>' + initialRoom.description.slice(pos+nameLength);
+        const initialRoom = nodes.square;
+        Object.entries(nodes).forEach(
+            ([key, value]) => {
+                value.objects?.forEach(
+                    object => {
+                        const pos = value.description.indexOf(object.name);
+                        const nameLength = object.name.length;
+                        value.description = value.description.slice(0, pos) 
+                        + '<a onClick = "clickWord(event)">'
+                        + value.description.slice(pos, pos+nameLength)
+                        + '</a>' + value.description.slice(pos+nameLength);
+                    }
+                );
             }
         );
         mainHtml.innerHTML += addNodeAsP(initialRoom, initialRoom.x, initialRoom.y);
         const initialRoomEl = document.querySelector(`#description${initialRoom.name}`);
         initialRoom.objects.forEach(
             object => {
-                initialRoomEl.innerHTML += addNodeAsP(nodes.objects[object.name], object.x, object.y);
+                initialRoomEl.innerHTML += addNodeAsP(nodes[object.name], object.x, object.y);
+                const objectEl = initialRoomEl.lastChild;
+                nodes[object.name].objects?.forEach(nestedObject => {
+                    console.log(nestedObject.name);
+                    objectEl.innerHTML += addNodeAsP(nodes[nestedObject.name], nestedObject.x, nestedObject.y)
+                });
             }
         );
         makeVisible(initialRoomEl, initialRoom.x, initialRoom.y);
         function addNodeAsP(node){
             return `<div class="description" id="description${node.name}" 
-            >${node['description']}</div>`;
+            >${node['description'].replaceAll('_', ' ')}</div>`;
         }
 
         function makeVisible(el, x, y){
-            console.log(x, y)
-            el.style = `color: white; transform: translate(${x}, ${y})`;
+            el.style = `position: relative; color: white; transform: translate(${x}, ${y})`;
         }
 
         function clickWord(input){
-            const el = document.querySelector(`#description${input.target.text}`);
-            const node = initialRoom.objects.find( entry => entry.name == input.target.text);
+            input.target.style = 'color: red;';
+            const parentNode = nodes[input.target.parentNode.id.slice(11)];
+            const newText = input.target.text.replaceAll(' ', '_');
+            const el = document.querySelector(`#description${newText}`);
+            const node = parentNode.objects.find( entry => entry.name == newText);
             makeVisible(el, node.x, node.y);
         }
 
